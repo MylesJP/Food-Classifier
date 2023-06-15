@@ -11,6 +11,7 @@ from PIL import Image
 from pathlib import Path
 import numpy as np
 import matplotlib.pyplot as plt
+import torchinfo
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
 
@@ -66,13 +67,13 @@ class TinyVGG(nn.Module):
                       out_channels=hidden_units,
                       kernel_size=3,
                       stride=1,
-                      padding=1),
+                      padding=0),
             nn.ReLU(),
             nn.Conv2d(in_channels=hidden_units,
                       out_channels=hidden_units,
                       kernel_size=3,
                       stride=1,
-                      padding=1),
+                      padding=0),
             nn.ReLU(),
             nn.MaxPool2d(kernel_size=2,
                          stride=2)
@@ -82,29 +83,31 @@ class TinyVGG(nn.Module):
                       out_channels=hidden_units,
                       kernel_size=3,
                       stride=1,
-                      padding=1),
+                      padding=0),
             nn.ReLU(),
             nn.Conv2d(in_channels=hidden_units,
                       out_channels=hidden_units,
                       kernel_size=3,
                       stride=1,
-                      padding=1),
+                      padding=0),
             nn.ReLU(),
             nn.MaxPool2d(kernel_size=2,
                          stride=2)
         )
         self.classifier = nn.Sequential(
             nn.Flatten(),
-            nn.Linear(in_features=hidden_units,
+            nn.Linear(in_features=hidden_units*13*13,
                       out_features=output_shape)
         )
 
     def forward(self, x):
-        return self.classifier(self.conv_block_2(self.conv_block_1(x)))  # This utilizes GPU better
+        return self.classifier(self.conv_block_2(self.conv_block_1(x)))  # This utilizes GPU better (operator fusion)
     
 torch.manual_seed(42)
 model_0 = TinyVGG(input_shape=3,  # 3 colour channels
                   hidden_units=10,  # From TinyVGG arch
                   output_shape=3).to(device)  # Pizza, sushi, or steak (full one will be 101)
 
-print(model_0)
+# Do a dummy forward pass on a single image batch to make sure hidden layers and shapes are correct
+
+print(torchinfo.summary(model=model_0, input_size=[1, 3, 64, 64]))
