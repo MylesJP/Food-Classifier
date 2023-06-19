@@ -358,5 +358,3 @@ pred_and_plot_image(model=model_1,
                     class_names=["pizza", "steak", "sushi"],
                     transform=custom_image_transform,
                     device=device)
-
-# 1:01:29:05
