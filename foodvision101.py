@@ -17,7 +17,7 @@ from pathlib import Path
 import requests
 from helper_functions import set_seeds, download_data, create_effnetb2
 import gradio as gr
-from time import timer
+from timeit import default_timer as timer
 import random
 from PIL import Image
 
@@ -132,3 +132,18 @@ example_list = [[str(filepath)] for filepath in random.sample(test_data_paths, k
 title = "Food Classifier Mini"
 description = "An EfficientNetB2 feature extractor computer vision model to classify images of food."
 article = "Link to my GitHub"
+
+demo = gr.Interface(fn=predict,
+                    inputs=gr.Image(type="pil"),
+                    outputs=[gr.Label(num_top_classes=3, label="Predictions"),
+                            gr.Number(label="Prediction time (s)")],
+                            examples=example_list,
+                            title=title,
+                            description=description,
+                            article=article  # Output of both label and time
+                    )
+
+demo.launch(debug=False,
+            share=True)  # Generate a public URL
+
+# Need to prepare files to host them on huggingface spaces
