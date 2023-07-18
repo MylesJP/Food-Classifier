@@ -1,2 +1,0 @@
-C:/Users/Myles/Documents/food-vision/demos/foodvision_mini/app.py filter=lfs diff=lfs merge=lfs -text
-*.pth filter=lfs diff=lfs merge=lfs -text
